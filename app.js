@@ -4,10 +4,8 @@
 const _supabaseUrl = 'https://jrmztxlwvwwqllgueblw.supabase.co';
 const _supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpybXp0eGx3dnd3cWxsZ3VlYmx3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY3MjUyNTgsImV4cCI6MjA5MjMwMTI1OH0.hgI2QdCsnvbxTdGti94KqWT-SK1-77VSW3b5JBzvKnI';
 
-// Inicialização do cliente Supabase
 const supabaseClient = supabase.createClient(_supabaseUrl, _supabaseKey);
 
-// Variável global para controle de edição
 let editandoId = null;
 
 // ================================================================
@@ -98,7 +96,7 @@ if (form) {
             status: editandoId ? undefined : statusAutomatico
         };
 
-        if(editandoId) { 
+        if (editandoId) { 
             delete dados.responsavel_agendamento; 
             delete dados.status; 
         }
@@ -152,7 +150,6 @@ async function carregarAgendamentos() {
     
     lista.innerHTML = data.map(item => {
         const dataFormatada = item.data_agendamento.split('-').reverse().join('/');
-        
         return `
         <tr class="border-b border-slate-50 hover:bg-slate-50 transition-colors">
             <td class="p-5 text-sm">
@@ -171,18 +168,10 @@ async function carregarAgendamentos() {
                     <span>${item.endereco} | <span class="font-black text-emerald-700">${item.localidade}</span></span>
                 </div>
                 <div class="flex gap-2 items-center">
-                    <div class="bg-slate-800 text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase">
-                        ${item.uf || 'RJ'}
-                    </div>
-                    <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[9px] font-bold uppercase">
-                        ${item.meio_atendimento || 'Moto'}
-                    </div>
-                    <div class="inline-block bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[10px] font-bold text-slate-600">
-                        🚘 FIPE: ${item.fipe || '---'}
-                    </div>
-                    <div class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-mono font-black tracking-widest border border-black shadow-sm">
-                        ${item.placa_veiculo || '---'}
-                    </div>
+                    <div class="bg-slate-800 text-white px-2 py-0.5 rounded text-[9px] font-bold uppercase">${item.uf || 'RJ'}</div>
+                    <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[9px] font-bold uppercase">${item.meio_atendimento || 'Moto'}</div>
+                    <div class="inline-block bg-slate-100 px-2 py-0.5 rounded border border-slate-200 text-[10px] font-bold text-slate-600">🚘 FIPE: ${item.fipe || '---'}</div>
+                    <div class="bg-slate-900 text-white px-2 py-0.5 rounded text-[10px] font-mono font-black tracking-widest border border-black shadow-sm">${item.placa_veiculo || '---'}</div>
                 </div>
             </td>
             <td class="p-5 text-sm">
@@ -191,9 +180,7 @@ async function carregarAgendamentos() {
             <td class="p-5 text-sm text-slate-600 font-medium">${item.responsavel_agendamento}</td>
             <td class="p-5 text-center">
                 <div class="flex flex-col gap-2 items-center">
-                    <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-black uppercase border border-amber-200">
-                        ${item.status}
-                    </span>
+                    <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-[10px] font-black uppercase border border-amber-200">${item.status}</span>
                     <div class="flex gap-2">
                         <button onclick="verDetalhes('${item.id}')" class="p-2 hover:bg-emerald-100 rounded-lg text-emerald-600 transition-all border border-transparent hover:border-emerald-200" title="Ver Informações">👁️</button>
                         <button onclick="prepararEdicao('${item.id}')" class="p-2 hover:bg-blue-100 rounded-lg text-blue-600 transition-all border border-transparent hover:border-blue-200" title="Editar">✏️</button>
@@ -201,17 +188,18 @@ async function carregarAgendamentos() {
                     </div>
                 </div>
             </td>
-        </tr>
-    `;}).join('');
+        </tr>`;
+    }).join('');
 
     if (typeof filtrarAgendamentosPlaca === "function") filtrarAgendamentosPlaca();
 }
 
+// ================================================================
 // 4. DETALHES, EDIÇÃO E EXCLUSÃO
+// ================================================================
 window.verDetalhes = async function(id) {
     const { data, error } = await supabaseClient.from('agendamentos').select('*').eq('id', id).single();
     if (error) return;
-
     Swal.fire({
         title: `<span class="text-emerald-600 font-black uppercase text-lg italic">Informações Técnicas</span>`,
         html: `
@@ -222,7 +210,7 @@ window.verDetalhes = async function(id) {
                     <p class="text-xs text-slate-600">${data.fipe} | <b>${data.placa_veiculo}</b></p>
                 </div>
                 <div class="flex gap-2">
-                     <div class="p-2 bg-slate-100 rounded flex-1 border border-slate-200">
+                    <div class="p-2 bg-slate-100 rounded flex-1 border border-slate-200">
                         <p class="text-[9px] font-black text-slate-400 uppercase">UF</p>
                         <p class="text-xs font-bold text-slate-700">${data.uf || '---'}</p>
                     </div>
@@ -235,8 +223,7 @@ window.verDetalhes = async function(id) {
                     <p class="text-[10px] font-black text-emerald-600 uppercase">Observações Importantes</p>
                     <p class="text-sm text-slate-700 mt-1 whitespace-pre-line">${data.observacao || 'Nenhuma observação cadastrada.'}</p>
                 </div>
-            </div>
-        `,
+            </div>`,
         confirmButtonText: 'ENTENDIDO',
         confirmButtonColor: '#10b981'
     });
@@ -251,7 +238,7 @@ window.excluirAgendamento = async function(id) {
 };
 
 window.prepararEdicao = async function(id) {
-    const { data, error } = await supabaseClient.from('agendamentos').select('*').eq('id', id).single();
+    const { data } = await supabaseClient.from('agendamentos').select('*').eq('id', id).single();
     if (data) {
         editandoId = id;
         document.getElementById('associado').value = data.associado;
@@ -264,8 +251,8 @@ window.prepararEdicao = async function(id) {
         document.getElementById('placa').value = data.placa_veiculo;
         document.getElementById('obs').value = data.observacao;
         document.getElementById('responsavel-agendamento').value = data.responsavel_agendamento;
-        if(data.meio_atendimento) document.getElementById('meio-atendimento').value = data.meio_atendimento;
-        if(data.uf) document.getElementById('uf-regiao').value = data.uf;
+        if (data.meio_atendimento) document.getElementById('meio-atendimento').value = data.meio_atendimento;
+        if (data.uf) document.getElementById('uf-regiao').value = data.uf;
 
         const btn = document.getElementById('btn-submit');
         if (btn) {
@@ -313,25 +300,90 @@ window.exibirDadosCompletosRoteirizacao = function(dados) {
                 <div class="text-center pt-2">
                     <span class="text-[10px] font-black text-slate-300 uppercase">Status: ${dados.status} | Resp: ${dados.responsavel_agendamento}</span>
                 </div>
-            </div>
-        `,
+            </div>`,
         confirmButtonText: 'FECHAR',
         confirmButtonColor: '#10b981'
     });
 };
 
+window.abrirDetalhesCard = function(el) {
+    try {
+        const dados = JSON.parse(decodeURIComponent(el.getAttribute('data-dados')));
+        window.exibirDadosCompletosRoteirizacao(dados);
+    } catch(e) {}
+};
+// Usa o campo 'regioes_atendidas' como JSON { "2026-05-01": "bairros..." }
+// Se o valor não for JSON válido, trata como string legada (compatibilidade).
+// ================================================================
+function lerBairrosParaData(tecBD, dataFiltro) {
+    const raw = tecBD.regioes_atendidas || '';
+    if (!raw) return '';
+    try {
+        const obj = JSON.parse(raw);
+        if (typeof obj === 'object' && obj !== null) {
+            // É o novo formato JSON por data
+            return dataFiltro ? (obj[dataFiltro] || '') : '';
+        }
+    } catch (e) {
+        // É o formato legado (string simples) — retorna direto
+        return raw;
+    }
+    return raw;
+}
+
+// ================================================================
+// HELPER: salva bairros do técnico para a data selecionada
+// Lê o JSON atual, atualiza só a chave da data e salva de volta.
+// ================================================================
+window.salvarBairrosPorData = async function(nomeRota, dataFiltro, valor) {
+    // Busca valor atual do campo
+    const { data: tecnico } = await supabaseClient
+        .from('técnicos')
+        .select('regioes_atendidas')
+        .eq('nome', nomeRota)
+        .single();
+
+    const raw = tecnico?.regioes_atendidas || '';
+    let obj = {};
+
+    // Tenta parsear como JSON; se falhar, migra o valor legado
+    try {
+        const parsed = JSON.parse(raw);
+        if (typeof parsed === 'object' && parsed !== null) {
+            obj = parsed;
+        } else {
+            // Era JSON mas não é objeto — descarta
+            obj = {};
+        }
+    } catch (e) {
+        // Era string legada — migra para a data atual se existir
+        if (raw && dataFiltro) {
+            obj[dataFiltro] = raw;
+        }
+    }
+
+    if (dataFiltro) {
+        obj[dataFiltro] = valor;
+    }
+
+    await supabaseClient
+        .from('técnicos')
+        .update({ regioes_atendidas: JSON.stringify(obj) })
+        .eq('nome', nomeRota);
+};
+
 async function carregarRoteirizacao() {
-    const dataFiltro = document.getElementById('filtro-data-rota')?.value;
-    
+    const dataFiltro = document.getElementById('filtro-data-rota')?.value || '';
+
     const { data: técnicosRaw } = await supabaseClient.from('técnicos').select('*');
     const técnicos = (técnicosRaw || []).sort((a, b) => {
         const numA = parseInt(a.nome.replace(/\D/g, ''), 10) || 0;
         const numB = parseInt(b.nome.replace(/\D/g, ''), 10) || 0;
         return numA - numB;
     });
-    
+
     let queryAgend = supabaseClient.from('agendamentos').select('*');
-    if(dataFiltro) queryAgend = queryAgend.eq('data_agendamento', dataFiltro);
+    if (dataFiltro) queryAgend = queryAgend.eq('data_agendamento', dataFiltro);
     const { data: agendamentos } = await queryAgend;
 
     const containerMotos = document.getElementById('motos-container');
@@ -344,91 +396,180 @@ async function carregarRoteirizacao() {
     const pendentes = (agendamentos || []).filter(a => a && a.status === 'Pendente');
     const countEl = document.getElementById('count-pendentes');
     if (countEl) countEl.innerText = pendentes.length;
-    
+
+    // Monta cards de pendentes com data-responsavel preservado
     pendentes.forEach(item => {
         const card = document.createElement('div');
         card.setAttribute('data-id', item.id);
         card.setAttribute('data-bairro', item.localidade);
-        card.setAttribute('data-placa', item.placa_veiculo || ""); 
-        card.className = `bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-400 cursor-grab mb-3 hover:shadow-md transition-shadow card-servico`;
-        card.innerHTML = `<p class="font-black text-[11px] uppercase">${item.associado}</p><p class="text-[10px] text-emerald-600">${item.localidade}</p>`;
-        
+        card.setAttribute('data-placa', item.placa_veiculo || '');
+        card.setAttribute('data-responsavel', item.responsavel_agendamento || '');
+        card.className = 'bg-white p-4 rounded-xl shadow-sm border-l-4 border-slate-400 cursor-grab mb-3 hover:shadow-md transition-shadow card-servico';
+        card.innerHTML = `
+            <p class="font-black text-[11px] uppercase">${item.associado}</p>
+            <p class="text-[10px] text-emerald-600 mb-1">${item.localidade}</p>
+            <button onclick="event.stopPropagation(); transferirServico('${item.id}')"
+                title="Transferir para outra data/rota"
+                class="bg-slate-100 hover:bg-emerald-100 text-slate-500 hover:text-emerald-700 text-[9px] font-black px-2 py-1 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all leading-none">
+                MOVER
+            </button>`;
         card.ondblclick = () => window.exibirDadosCompletosRoteirizacao(item);
         listaPendentes.appendChild(card);
     });
 
+    // ----------------------------------------------------------------
+    // Sortable da coluna de PENDENTES
+    // FIX ARRASTO: NÃO chama carregarRoteirizacao() dentro do onAdd.
+    // Apenas atualiza o banco e o contador — o card já está no DOM
+    // pelo próprio SortableJS, não precisa recriar nada.
+    // ----------------------------------------------------------------
+    new Sortable(listaPendentes, {
+        group: 'shared',
+        animation: 150,
+        onAdd: async function(evt) {
+            const card = evt.item;
+            const agendamentoId = card.getAttribute('data-id');
+            // Preserva o responsavel original salvo no card
+            const responsavelOriginal = card.getAttribute('data-responsavel') || 'Caio Pinheiro';
+
+            await supabaseClient.from('agendamentos').update({
+                status: 'Pendente',
+                responsavel_agendamento: responsavelOriginal
+            }).eq('id', agendamentoId);
+
+            // Atualiza só o contador de pendentes sem recarregar tudo
+            if (countEl) countEl.innerText = listaPendentes.querySelectorAll('[data-id]').length;
+
+            // Mantém o filtro de técnico ativo se houver
+            const termoFiltro = document.getElementById('busca-técnico')?.value || '';
+            if (termoFiltro) filtrarColunastécnicos();
+        }
+    });
+
+    // Monta colunas dos técnicos
     (técnicos || []).forEach(tecBD => {
         const nomeDaRota = tecBD.nome;
         const servicosNaRota = (agendamentos || []).filter(a => a && a.responsavel_agendamento === nomeDaRota);
         const corBorda = servicosNaRota.length >= 9 ? 'border-red-500' : 'border-emerald-400';
 
+        // Lê os bairros corretos para a data filtrada
+        const bairrosParaData = lerBairrosParaData(tecBD, dataFiltro);
+
         const col = document.createElement('div');
         col.className = `coluna-técnico bg-white p-5 rounded-2xl shadow-sm border-t-8 ${corBorda} min-h-[400px] flex flex-col relative`;
-        col.setAttribute('data-nome', nomeDaRota); 
-        
+        col.setAttribute('data-nome', nomeDaRota);
+
         col.innerHTML = `
             <button onclick="excluirTecnico('${tecBD.id}', '${nomeDaRota}')" class="absolute top-2 right-2 text-slate-300 hover:text-red-500 text-xs">✖</button>
             <div class="mb-4 border-b pb-2">
                 <div class="flex justify-between items-center">
                     <h4 class="font-black text-[12px] uppercase text-slate-800">${nomeDaRota}</h4>
-                    <span class="text-[10px] font-bold ${servicosNaRota.length >= 9 ? 'text-red-500' : 'text-emerald-500'}">${servicosNaRota.length}/9</span>
+                    <span class="contador-rota text-[10px] font-bold ${servicosNaRota.length >= 9 ? 'text-red-500' : 'text-emerald-500'}">${servicosNaRota.length}/9</span>
                 </div>
                 <div class="mt-2 space-y-1">
-                    <input type="text" placeholder="técnico do dia" onblur="atualizarDadosRota('${nomeDaRota}', 'tecnico_dia', this.value)" value="${tecBD.tecnico_dia || ''}" class="w-full text-[10px] p-1 border rounded bg-slate-50 outline-none focus:border-emerald-500">
-                    <input type="text" placeholder="WhatsApp" onblur="atualizarDadosRota('${nomeDaRota}', 'whatsapp', this.value)" value="${tecBD.whatsapp || ''}" class="w-full text-[10px] p-1 border rounded bg-slate-50 outline-none focus:border-emerald-500">
-                    <textarea placeholder="Bairros (Ex: Centro, Lapa)" onblur="atualizarDadosRota('${nomeDaRota}', 'regioes_atendidas', this.value)" class="textarea-bairros w-full text-[9px] p-1 border rounded bg-emerald-50 h-10 resize-none outline-none focus:border-emerald-500">${tecBD.regioes_atendidas || ''}</textarea>
+                    <input type="text" placeholder="técnico do dia"
+                        onblur="atualizarDadosRota('${nomeDaRota}', 'tecnico_dia', this.value)"
+                        value="${tecBD.tecnico_dia || ''}"
+                        class="w-full text-[10px] p-1 border rounded bg-slate-50 outline-none focus:border-emerald-500">
+                    <input type="text" placeholder="WhatsApp"
+                        onblur="atualizarDadosRota('${nomeDaRota}', 'whatsapp', this.value)"
+                        value="${tecBD.whatsapp || ''}"
+                        class="w-full text-[10px] p-1 border rounded bg-slate-50 outline-none focus:border-emerald-500">
+                    <textarea placeholder="Bairros (Ex: Centro, Lapa)"
+                        class="textarea-bairros w-full text-[9px] p-1 border rounded bg-emerald-50 h-10 resize-none outline-none focus:border-emerald-500"
+                        onblur="salvarBairrosPorData('${nomeDaRota}', '${dataFiltro}', this.value)">${bairrosParaData}</textarea>
                 </div>
                 <button onclick="enviarRotaZap('${nomeDaRota}', '${tecBD.whatsapp}')" class="w-full mt-2 bg-emerald-500 text-white text-[10px] font-bold py-1.5 rounded-lg hover:bg-emerald-600 transition-all shadow-sm">ENVIAR WHATSAPP (PDF)</button>
                 ${renderizarBotaoExtra(nomeDaRota)}
             </div>
-            <div id="moto-${nomeDaRota.replace(/\s/g, '-')}" class="space-y-3 min-h-[300px] flex-1 moto-dropzone rounded-xl bg-slate-50/50 p-2" data-rota="${nomeDaRota}">
-                ${servicosNaRota.map(s => `
-                    <div class="bg-white p-2 rounded shadow-sm text-[10px] font-bold border-l-2 border-emerald-500 cursor-grab card-servico" 
-                         data-id="${s.id}" data-bairro="${s.localidade}" data-placa="${s.placa_veiculo || ""}"
-                         onclick='window.exibirDadosCompletosRoteirizacao(${JSON.stringify(s)})'>
-                        ${s.associado} <br> <span class="font-normal text-slate-400">${s.localidade}</span>
-                    </div>
-                `).join('')}
-            </div>
-        `;
+            <div id="moto-${nomeDaRota.replace(/\s/g, '-')}"
+                class="space-y-3 min-h-[300px] flex-1 moto-dropzone rounded-xl bg-slate-50/50 p-2"
+                data-rota="${nomeDaRota}">
+                ${servicosNaRota.map(s => {
+                    const dadosEncoded = encodeURIComponent(JSON.stringify(s));
+                    return `
+                    <div class="bg-white p-2 rounded shadow-sm text-[10px] font-bold border-l-2 border-emerald-500 cursor-grab card-servico"
+                         data-id="${s.id}"
+                         data-bairro="${s.localidade}"
+                         data-placa="${s.placa_veiculo || ''}"
+                         data-responsavel="${s.responsavel_agendamento || ''}"
+                         data-dados="${dadosEncoded}"
+                         onclick="window.abrirDetalhesCard(this)">
+                        ${s.associado} <br>
+                        <span class="font-normal text-slate-400">${s.localidade}</span><br>
+                        <button onclick="event.stopPropagation(); transferirServico('${s.id}')"
+                            title="Transferir para outra data/rota"
+                            class="mt-1 bg-slate-100 hover:bg-emerald-100 text-slate-500 hover:text-emerald-700 text-[9px] font-black px-2 py-1 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all leading-none">
+                            MOVER
+                        </button>
+                    </div>`;
+                }).join('')}
+            </div>`;
+
         containerMotos.appendChild(col);
 
+        // ----------------------------------------------------------------
+        // Sortable de cada DROPZONE de técnico
+        // FIX ARRASTO: Também NÃO chama carregarRoteirizacao() no onAdd.
+        // Atualiza banco e contador localmente.
+        // ----------------------------------------------------------------
         new Sortable(document.getElementById(`moto-${nomeDaRota.replace(/\s/g, '-')}`), {
             group: 'shared',
             animation: 150,
-            onAdd: async function (evt) {
-                const bairroAgendamento = evt.item.getAttribute('data-bairro').trim().toLowerCase();
-                const containerAlvo = evt.to;
-                const textareaBairros = containerAlvo.closest('.coluna-técnico').querySelector('.textarea-bairros');
-                const listaBairrosTecnico = (textareaBairros?.value || "").replace(/\n/g, ',').split(',').map(b => b.trim().toLowerCase()).filter(b => b !== "");
+            onAdd: async function(evt) {
+                const card = evt.item;
+                const agendamentoId = card.getAttribute('data-id');
+                const bairroAgendamento = card.getAttribute('data-bairro').trim().toLowerCase();
 
-                if (listaBairrosTecnico.length > 0 && !listaBairrosTecnico.some(b => b === bairroAgendamento || bairroAgendamento.includes(b))) {
+                const textareaBairros = evt.to.closest('.coluna-técnico').querySelector('.textarea-bairros');
+                const listaBairrosTecnico = (textareaBairros?.value || '')
+                    .replace(/\n/g, ',')
+                    .split(',')
+                    .map(b => b.trim().toLowerCase())
+                    .filter(b => b !== '');
+
+                if (listaBairrosTecnico.length > 0 &&
+                    !listaBairrosTecnico.some(b => b === bairroAgendamento || bairroAgendamento.includes(b))) {
                     alert(`Atenção: O bairro "${bairroAgendamento.toUpperCase()}" não está na lista de atendimento de ${nomeDaRota}!`);
                 }
 
-                if(servicosNaRota.length >= 9) {
-                    alert("Limite de 9 serviços atingido para este técnico!");
-                    carregarRoteirizacao();
+                // Conta cards já na dropzone (exclui o que acabou de entrar)
+                const totalAtual = evt.to.querySelectorAll('[data-id]').length;
+                if (totalAtual > 9) {
+                    alert('Limite de 9 serviços atingido para este técnico!');
+                    // Devolve o card para a origem sem chamar o banco
+                    evt.from.appendChild(card);
                     return;
                 }
-                await atualizarStatusAgendamento(evt.item.getAttribute('data-id'), nomeDaRota);
+
+                await supabaseClient.from('agendamentos').update({
+                    status: 'Em Rota',
+                    responsavel_agendamento: nomeDaRota
+                }).eq('id', agendamentoId);
+
+                // Atualiza o data-responsavel do card para o novo técnico
+                card.setAttribute('data-responsavel', nomeDaRota);
+
+                // Atualiza contadores localmente
+                const contadorEl = evt.to.closest('.coluna-técnico').querySelector('.contador-rota');
+                if (contadorEl) {
+                    const novoTotal = evt.to.querySelectorAll('[data-id]').length;
+                    contadorEl.innerText = `${novoTotal}/9`;
+                    contadorEl.className = `contador-rota text-[10px] font-bold ${novoTotal >= 9 ? 'text-red-500' : 'text-emerald-500'}`;
+                }
+                if (countEl) countEl.innerText = listaPendentes.querySelectorAll('[data-id]').length;
+
+                // Mantém filtro ativo
+                const termoFiltro = document.getElementById('busca-técnico')?.value || '';
+                if (termoFiltro) filtrarColunastécnicos();
             }
         });
     });
-
-    new Sortable(listaPendentes, { 
-        group: 'shared', 
-        animation: 150,
-        onAdd: async function (evt) {
-             await supabaseClient.from('agendamentos').update({ 
-                status: 'Pendente', 
-                responsavel_agendamento: 'Caio Pinheiro' 
-            }).eq('id', evt.item.getAttribute('data-id'));
-            carregarRoteirizacao();
-        }
-    });
 }
 
+// ================================================================
+// FUNÇÕES DE SUPORTE À ROTEIRIZAÇÃO
+// ================================================================
 window.adicionarNovaMoto = async function() {
     const { value: nomeMoto } = await Swal.fire({
         title: 'Nome da Nova Moto / Técnico',
@@ -437,19 +578,20 @@ window.adicionarNovaMoto = async function() {
         showCancelButton: true,
         confirmButtonColor: '#10b981'
     });
-
     if (nomeMoto) {
         const { error } = await supabaseClient.from('técnicos').insert([{ nome: nomeMoto }]);
-        if (error) alert("Erro ao adicionar: " + error.message);
+        if (error) alert('Erro ao adicionar: ' + error.message);
         else carregarRoteirizacao();
     }
 };
 
 window.excluirTecnico = async function(id, nome) {
     if (confirm(`Excluir a coluna "${nome}"? Agendamentos nela voltarão para pendentes.`)) {
-        await supabaseClient.from('agendamentos').update({ status: 'Pendente', responsavel_agendamento: 'Caio Pinheiro' }).eq('responsavel_agendamento', nome);
+        await supabaseClient.from('agendamentos')
+            .update({ status: 'Pendente', responsavel_agendamento: 'Caio Pinheiro' })
+            .eq('responsavel_agendamento', nome);
         const { error } = await supabaseClient.from('técnicos').delete().eq('id', id);
-        if (error) alert("Erro ao excluir");
+        if (error) alert('Erro ao excluir');
         else carregarRoteirizacao();
     }
 };
@@ -461,7 +603,8 @@ window.enviarRotaZap = async function(nomeTecnico, whatsapp) {
         .eq('responsavel_agendamento', nomeTecnico)
         .eq('data_agendamento', dataFiltro);
 
-    if(!agendamentos || agendamentos.length === 0) return alert("Não há agendamentos nesta rota para hoje.");
+    if (!agendamentos || agendamentos.length === 0)
+        return alert('Não há agendamentos nesta rota para hoje.');
 
     let resumo = `*ROTA DO DIA - ${nomeTecnico}*\n*DATA: ${dataFiltro.split('-').reverse().join('/')}*\n\n`;
     agendamentos.slice(0, 9).forEach((a, index) => {
@@ -474,46 +617,43 @@ window.enviarRotaZap = async function(nomeTecnico, whatsapp) {
 };
 
 async function atualizarDadosRota(nomeRota, campo, valor) {
-    const update = {}; 
+    const update = {};
     update[campo] = valor;
     await supabaseClient.from('técnicos').update(update).eq('nome', nomeRota);
-}
-
-async function atualizarStatusAgendamento(agendamentoId, técnicoNome) {
-    await supabaseClient.from('agendamentos').update({ status: 'Em Rota', responsavel_agendamento: técnicoNome }).eq('id', agendamentoId);
-    carregarRoteirizacao();
 }
 
 // ================================================================
 // LÓGICA DE FILTRAGEM
 // ================================================================
 window.filtrarAgendamentosPlaca = function() {
-    const termo = document.getElementById('busca-placa-agendamento')?.value.toLowerCase() || "";
+    const termo = document.getElementById('busca-placa-agendamento')?.value.toLowerCase() || '';
     document.querySelectorAll('#lista-agendamentos tr').forEach(linha => {
-        const textoPlaca = linha.querySelector('.font-mono')?.innerText.toLowerCase() || "";
-        const textoAssociado = linha.querySelector('.font-black')?.innerText.toLowerCase() || "";
-        linha.style.display = (textoPlaca.includes(termo) || textoAssociado.includes(termo) || termo === "") ? "" : "none";
+        const textoPlaca = linha.querySelector('.font-mono')?.innerText.toLowerCase() || '';
+        const textoAssociado = linha.querySelector('.font-black')?.innerText.toLowerCase() || '';
+        linha.style.display = (textoPlaca.includes(termo) || textoAssociado.includes(termo) || termo === '') ? '' : 'none';
     });
 };
 
 window.filtrarColunastécnicos = function() {
-    const termo = document.getElementById('busca-técnico')?.value.toLowerCase() || "";
+    const termo = document.getElementById('busca-técnico')?.value.toLowerCase() || '';
     document.querySelectorAll('.coluna-técnico').forEach(col => {
         const nomeTecnico = col.getAttribute('data-nome').toLowerCase();
         let encontrouNaColuna = false;
 
         col.querySelectorAll('.card-servico').forEach(card => {
-            const placa = (card.getAttribute('data-placa') || "").toLowerCase();
+            const placa = (card.getAttribute('data-placa') || '').toLowerCase();
             const associado = card.innerText.toLowerCase();
-            if (termo === "" || placa.includes(termo) || associado.includes(termo)) {
-                card.style.display = "block";
+            const visivel = termo === '' || placa.includes(termo) || associado.includes(termo) || nomeTecnico.includes(termo);
+            card.style.display = visivel ? 'block' : 'none';
+            if (visivel && termo !== '') {
                 encontrouNaColuna = true;
-                termo !== "" ? card.classList.add('ring-2', 'ring-amber-500') : card.classList.remove('ring-2', 'ring-amber-500');
+                card.classList.add('ring-2', 'ring-amber-500');
             } else {
-                card.style.display = "none";
+                card.classList.remove('ring-2', 'ring-amber-500');
             }
         });
-        col.style.display = (nomeTecnico.includes(termo) || encontrouNaColuna || termo === "") ? "block" : "none";
+
+        col.style.display = (nomeTecnico.includes(termo) || encontrouNaColuna || termo === '') ? 'block' : 'none';
     });
 };
 
@@ -530,8 +670,7 @@ async function carregarControleFinanceiro() {
             <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
                 <p class="text-[10px] font-black text-blue-600 uppercase">Total de Registros</p>
                 <p class="text-2xl font-bold text-blue-700">${data.length}</p>
-            </div>
-        `;
+            </div>`;
     }
 }
 
@@ -564,32 +703,151 @@ async function adicionarServicoExtra(tecnicoNome) {
                     <option value="Manutenção">Manutenção</option>
                     <option value="Retirada">Retirada</option>
                 </select>
-            </div>
-        `,
+            </div>`,
         focusConfirm: false,
         showCancelButton: true,
         confirmButtonText: 'SALVAR EXTRA',
         confirmButtonColor: '#f59e0b',
-        preConfirm: () => {
-            return {
-                data_agendamento: document.getElementById('swal-data').value,
-                associado: document.getElementById('swal-associado').value,
-                localidade: document.getElementById('swal-localidade').value,
-                endereco: document.getElementById('swal-endereco').value,
-                placa_veiculo: document.getElementById('swal-placa').value,
-                servico: document.getElementById('swal-servico').value,
-                responsavel_agendamento: tecnicoNome,
-                status: 'Em Rota',
-                periodo: 'Integral',
-                meio_atendimento: 'Moto',
-                uf: 'RJ'
-            }
-        }
+        preConfirm: () => ({
+            data_agendamento: document.getElementById('swal-data').value,
+            associado: document.getElementById('swal-associado').value,
+            localidade: document.getElementById('swal-localidade').value,
+            endereco: document.getElementById('swal-endereco').value,
+            placa_veiculo: document.getElementById('swal-placa').value,
+            servico: document.getElementById('swal-servico').value,
+            responsavel_agendamento: tecnicoNome,
+            status: 'Em Rota',
+            periodo: 'Integral',
+            meio_atendimento: 'Moto',
+            uf: 'RJ'
+        })
     });
 
     if (formValues) {
         const { error } = await supabaseClient.from('agendamentos').insert([formValues]);
-        if (error) alert("Erro ao salvar serviço extra: " + error.message);
+        if (error) alert('Erro ao salvar serviço extra: ' + error.message);
         else carregarRoteirizacao();
     }
 }
+
+// ================================================================
+// TRANSFERÊNCIA DE SERVIÇO PARA OUTRA DATA / ROTA
+// ================================================================
+window.transferirServico = async function(agendamentoId) {
+    // Busca dados atuais do agendamento
+    const { data: ag, error } = await supabaseClient
+        .from('agendamentos')
+        .select('*')
+        .eq('id', agendamentoId)
+        .single();
+
+    if (error || !ag) return alert('Erro ao buscar dados do serviço.');
+
+    // Busca lista de técnicos para popular o select
+    const { data: tecnicos } = await supabaseClient.from('técnicos').select('nome').order('nome');
+    const opcoesRotas = (tecnicos || [])
+        .map(t => `<option value="${t.nome}" ${t.nome === ag.responsavel_agendamento ? 'selected' : ''}>${t.nome}</option>`)
+        .join('');
+
+    const { value: formValues, isConfirmed } = await Swal.fire({
+        title: `<span class="text-slate-700 font-black text-base">🔁 Transferir Serviço</span>`,
+        html: `
+            <div class="text-left space-y-3 mt-2">
+                <div class="p-3 bg-slate-50 rounded-lg border border-slate-200">
+                    <p class="text-[10px] font-black text-slate-400 uppercase">Serviço</p>
+                    <p class="text-sm font-bold text-slate-800">${ag.associado}</p>
+                    <p class="text-[11px] text-slate-500">${ag.localidade} · ${ag.servico}</p>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-black text-slate-500 uppercase block mb-1">Nova Data</label>
+                    <input type="date" id="transf-data" value="${ag.data_agendamento}"
+                        class="w-full border-2 border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-emerald-500">
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-black text-slate-500 uppercase block mb-1">Nova Rota / Técnico</label>
+                    <select id="transf-rota"
+                        class="w-full border-2 border-slate-200 rounded-lg p-2 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-500 bg-white">
+                        <option value="Pendente">⏳ Deixar como Pendente</option>
+                        ${opcoesRotas}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[11px] font-black text-slate-500 uppercase block mb-1">Período</label>
+                    <select id="transf-periodo"
+                        class="w-full border-2 border-slate-200 rounded-lg p-2 text-sm font-semibold text-slate-700 outline-none focus:border-emerald-500 bg-white">
+                        <option value="Manhã"   ${ag.periodo === 'Manhã'      ? 'selected' : ''}>☀️ Manhã</option>
+                        <option value="Tarde"   ${ag.periodo === 'Tarde'      ? 'selected' : ''}>🌤️ Tarde</option>
+                        <option value="Comercial" ${ag.periodo === 'Comercial' ? 'selected' : ''}>🏢 Comercial</option>
+                        <option value="Integral" ${ag.periodo === 'Integral'  ? 'selected' : ''}>📅 Integral</option>
+                    </select>
+                </div>
+            </div>`,
+        showCancelButton: true,
+        confirmButtonText: 'TRANSFERIR',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#10b981',
+        focusConfirm: false,
+        preConfirm: () => {
+            const novaData  = document.getElementById('transf-data').value;
+            const novaRota  = document.getElementById('transf-rota').value;
+            const novoPeriodo = document.getElementById('transf-periodo').value;
+            if (!novaData) {
+                Swal.showValidationMessage('Informe a nova data.');
+                return false;
+            }
+            return { novaData, novaRota, novoPeriodo };
+        }
+    });
+
+    if (!isConfirmed || !formValues) return;
+
+    const { novaData, novaRota, novoPeriodo } = formValues;
+    const novoStatus = novaRota === 'Pendente' ? 'Pendente' : 'Em Rota';
+    const novoResponsavel = novaRota === 'Pendente' ? ag.responsavel_agendamento : novaRota;
+
+    // Se foi para uma rota real, verifica limite de 9
+    if (novaRota !== 'Pendente') {
+        const { count } = await supabaseClient
+            .from('agendamentos')
+            .select('*', { count: 'exact', head: true })
+            .eq('data_agendamento', novaData)
+            .eq('responsavel_agendamento', novaRota);
+
+        if (count >= 9) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'Limite atingido',
+                text: `${novaRota} já tem 9 serviços em ${novaData.split('-').reverse().join('/')}.`,
+                confirmButtonColor: '#10b981'
+            });
+        }
+    }
+
+    const { error: updateError } = await supabaseClient
+        .from('agendamentos')
+        .update({
+            data_agendamento: novaData,
+            responsavel_agendamento: novoResponsavel,
+            status: novoStatus,
+            periodo: novoPeriodo
+        })
+        .eq('id', agendamentoId);
+
+    if (updateError) {
+        return alert('Erro ao transferir: ' + updateError.message);
+    }
+
+    await Swal.fire({
+        icon: 'success',
+        title: 'Transferido!',
+        text: `Serviço movido para ${novaData.split('-').reverse().join('/')} → ${novaRota === 'Pendente' ? 'Pendentes' : novaRota}`,
+        confirmButtonColor: '#10b981',
+        timer: 2000,
+        showConfirmButton: false
+    });
+
+    carregarRoteirizacao();
+};
