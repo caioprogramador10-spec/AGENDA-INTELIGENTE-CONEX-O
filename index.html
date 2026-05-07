@@ -14,21 +14,29 @@
 </head>
 <body class="bg-slate-50 font-sans text-slate-900">
 
-    <nav class="bg-slate-900 text-white p-4 shadow-xl sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
+    <!-- ================================================================
+         NAVBAR
+    ================================================================ -->
+    <nav class="bg-slate-900 text-white shadow-xl sticky top-0 z-50">
+
+        <!-- Barra de navegação -->
+        <div class="container mx-auto px-4 pb-3 flex justify-between items-center">
             <h1 class="text-xl font-black tracking-tighter italic">
                 CONEXÃO <span class="text-emerald-400">AGENDA</span>
             </h1>
             <div class="flex gap-4 md:gap-8">
-                <button onclick="showTab('agendamento')" id="tab-agendamento" class="nav-link pb-1 active-tab">Agendamentos</button>
-                <button onclick="showTab('roteirizacao')" id="tab-roteirizacao" class="nav-link pb-1">Roteirização</button>
-                
+                <button onclick="showTab('agendamento')"  id="tab-agendamento"  class="nav-link pb-1 active-tab">Agendamentos</button>
+                <button onclick="showTab('roteirizacao')" id="tab-roteirizacao" class="nav-link pb-1 text-slate-400">Roteirização</button>
+                <button onclick="showTab('frustrados')"   id="tab-frustrados"   class="nav-link pb-1 text-slate-400">Não Realizados</button>
             </div>
         </div>
     </nav>
 
     <main class="container mx-auto p-4 md:p-8">
-        
+
+        <!-- ============================================================
+             ABA: AGENDAMENTOS
+        ============================================================ -->
         <section id="sec-agendamento">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
                 <div>
@@ -39,7 +47,7 @@
                     Sessão: Conexão Rastreadores (ADS)
                 </span>
             </div>
-            
+
             <div class="bg-white p-8 rounded-2xl shadow-xl border border-slate-100 mb-10">
                 <form id="form-agendamento" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="space-y-1">
@@ -52,7 +60,7 @@
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Data do Serviço</label>
-                        <input type="date" id="data" class="w-full border-2 border-slate-100 p-3 rounded-xl focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all" required>
+                        <input type="date" id="data" class="w-full border-2 border-slate-100 p-3 rounded-xl outline-none transition-all" required>
                     </div>
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Localidade (Bairro/Cidade)</label>
@@ -62,7 +70,6 @@
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Endereço Completo</label>
                         <input type="text" id="endereco" placeholder="Rua, número e ponto de referência" class="w-full border-2 border-slate-100 p-3 rounded-xl outline-none" required>
                     </div>
-                    
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Tipo de Serviço</label>
                         <select id="servico" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700">
@@ -71,7 +78,6 @@
                             <option value="Manutenção">🔧 Manutenção</option>
                         </select>
                     </div>
-                    
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Período</label>
                         <select id="periodo" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700">
@@ -80,24 +86,21 @@
                             <option value="Comercial">🏢 Comercial</option>
                         </select>
                     </div>
-
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Placa do Veículo</label>
                         <input type="text" id="placa" placeholder="Placa do Veículo" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none">
                     </div>
-
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Meio de Atendimento</label>
-                        <select id="meio-atendimento" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700 focus:border-emerald-500">
-                            <option value="Moto">🏍️ Moto </option>
+                        <select id="meio-atendimento" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700">
+                            <option value="Moto">🏍️ Moto</option>
                             <option value="Externo">🤝 Prestador Externo</option>
                             <option value="Posto Fixo">📍 Posto Fixo</option>
                         </select>
                     </div>
-
                     <div class="space-y-1">
                         <label class="text-xs font-bold uppercase text-slate-500 ml-1">Estado / Região (UF)</label>
-                        <select id="uf-regiao" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700 focus:border-emerald-500">
+                        <select id="uf-regiao" class="w-full bg-slate-50 border-2 border-slate-100 p-3 rounded-xl outline-none font-semibold text-slate-700">
                             <option value="AC">Acre (AC)</option>
                             <option value="AL">Alagoas (AL)</option>
                             <option value="AP">Amapá (AP)</option>
@@ -127,32 +130,30 @@
                             <option value="TO">Tocantins (TO)</option>
                         </select>
                     </div>
-                    
-                      <!-- Campo: Responsável pelo Agendamento -->
-                    <div class="flex flex-col">
-                      <label class="text-xs font-bold text-slate-600 mb-1">RESPONSÁVEL PELO AGENDAMENTO</label>
-                      <input type="text" id="responsavel-agendamento" placeholder="Nome de quem está agendando" 
-                      class="w-full p-2 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                    <div class="flex flex-col space-y-1">
+                        <label class="text-xs font-bold uppercase text-slate-500 ml-1">Responsável pelo Agendamento</label>
+                        <input type="text" id="responsavel-agendamento" placeholder="Nome de quem está agendando"
+                            class="w-full p-3 border-2 border-slate-100 rounded-xl text-sm outline-none">
                     </div>
 
                     <textarea id="obs" placeholder="Observações importantes para o técnico..." class="border-2 border-slate-100 p-3 rounded-xl col-span-full h-24 outline-none"></textarea>
-                    
+
                     <button type="submit" id="btn-submit" class="bg-emerald-500 hover:bg-emerald-600 text-white font-black py-4 px-8 rounded-xl shadow-lg shadow-emerald-200 transition-all transform hover:-translate-y-1 active:scale-95 col-span-full">
                         CONFIRMAR AGENDAMENTO
                     </button>
                 </form>
             </div>
 
+            <!-- Filtros da tabela -->
             <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
                 <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
                     <div class="w-full md:w-48">
                         <label class="text-[10px] font-black uppercase text-slate-500 mb-1 block ml-1">Filtrar lista por data</label>
                         <input type="date" id="filtro-data-lista" onchange="carregarAgendamentos()" class="w-full bg-white border-2 border-slate-200 p-2 rounded-xl text-sm outline-none focus:border-emerald-500 transition-all shadow-sm">
                     </div>
-                    <!-- NOVO FILTRO POR PLACA (AGENDAMENTOS) -->
                     <div class="w-full md:w-48">
                         <label class="text-[10px] font-black uppercase text-slate-500 mb-1 block ml-1">Filtrar por Placa</label>
-                        <input type="text" id="busca-placa-agendamento" onkeyup="carregarAgendamentos()" placeholder="Ex: ABC1D23" class="w-full bg-white border-2 border-slate-200 p-2 rounded-xl text-sm outline-none focus:border-emerald-500 transition-all shadow-sm font-bold uppercase">
+                        <input type="text" id="busca-placa-agendamento" onkeyup="filtrarAgendamentosPlaca()" placeholder="Ex: ABC1D23" class="w-full bg-white border-2 border-slate-200 p-2 rounded-xl text-sm outline-none focus:border-emerald-500 transition-all shadow-sm font-bold uppercase">
                     </div>
                     <div class="w-full md:w-48">
                         <label class="text-[10px] font-black uppercase text-slate-500 mb-1 block ml-1">Filtrar por Meio</label>
@@ -182,19 +183,20 @@
             </div>
         </section>
 
-        <section id="sec-roteirizacao" class="hidden animate-fade-in"> 
+        <!-- ============================================================
+             ABA: ROTEIRIZAÇÃO
+        ============================================================ -->
+        <section id="sec-roteirizacao" class="hidden">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
                 <h2 class="text-3xl font-black text-slate-800">Logística e Rotas</h2>
-                
+
                 <div class="flex flex-col md:flex-row gap-2 w-full md:w-auto">
-                    <!-- FILTRO POR MOTO (ORIGINAL) -->
                     <div class="relative w-full md:w-64">
-                        <input type="text" id="busca-técnico" onkeyup="filtrarColunastécnicos()" 
-                               placeholder="Filtrar Moto..." 
+                        <input type="text" id="busca-técnico" onkeyup="filtrarColunastécnicos()"
+                               placeholder="Filtrar Moto..."
                                class="w-full pl-4 pr-10 py-3 bg-white border-2 border-slate-200 rounded-xl font-bold text-slate-600 outline-none focus:border-emerald-500 transition-all shadow-sm">
                         <span class="absolute right-3 top-3 text-slate-400">🔍</span>
                     </div>
-                    
                 </div>
 
                 <div class="flex flex-wrap gap-3 bg-white p-2 rounded-xl shadow-sm border">
@@ -211,7 +213,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <div class="bg-slate-200/50 p-5 rounded-2xl border-2 border-dashed border-slate-300 self-start sticky top-24">
                     <h3 class="font-black mb-6 text-slate-500 uppercase text-xs tracking-widest flex justify-between items-center">
-                        OS Pendentes 
+                        OS Pendentes
                         <span id="count-pendentes" class="bg-slate-800 text-white px-3 py-1 rounded-full text-[10px]">0</span>
                     </h3>
                     <div id="pendentes-lista" class="space-y-4 min-h-[500px] max-h-[70vh] overflow-y-auto pr-2"></div>
@@ -220,14 +222,48 @@
             </div>
         </section>
 
-        <section id="sec-controle" class="hidden"> 
-            <h2 class="text-3xl font-black mb-6 text-slate-800 tracking-tight"></h2> 
-            <div id="lista-WhatsApp" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <!-- ============================================================
+             ABA: NÃO REALIZADOS (FRUSTRADOS)
+        ============================================================ -->
+        <section id="sec-frustrados" class="hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-800">Serviços Não Realizados</h2>
+                    <p class="text-slate-500">Registro de atendimentos frustrados e seus motivos</p>
+                </div>
+                <div class="flex gap-3 flex-wrap items-end">
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-500 mb-1 block ml-1">Filtrar por Data</label>
+                        <input type="date" id="filtro-data-frustrado" onchange="carregarFrustrados()"
+                            class="bg-white border-2 border-slate-200 p-2 rounded-xl text-sm outline-none focus:border-red-400 transition-all shadow-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase text-slate-500 mb-1 block ml-1">Filtrar por Placa / Cliente</label>
+                        <input type="text" id="filtro-placa-frustrado" onkeyup="carregarFrustrados()"
+                            placeholder="Ex: ABC1D23 ou nome"
+                            class="bg-white border-2 border-slate-200 p-2 rounded-xl text-sm outline-none focus:border-red-400 transition-all shadow-sm font-bold uppercase w-48">
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-red-50">
+                        <tr>
+                            <th class="p-4 text-xs font-black uppercase text-red-400 tracking-wider border-b border-red-100">Data / Resp.</th>
+                            <th class="p-4 text-xs font-black uppercase text-red-400 tracking-wider border-b border-red-100">Cliente / Local</th>
+                            <th class="p-4 text-xs font-black uppercase text-red-400 tracking-wider border-b border-red-100">Serviço</th>
+                            <th class="p-4 text-xs font-black uppercase text-red-400 tracking-wider border-b border-red-100">Motivo</th>
+                            <th class="p-4 text-xs font-black uppercase text-red-400 tracking-wider border-b border-red-100 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista-frustrados" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
         </section>
+
     </main>
 
     <script src="app.js"></script>
-
-   
 </body>
 </html>
