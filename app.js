@@ -479,7 +479,7 @@ async function carregarRoteirizacao() {
         }).join('');
 
         var col = document.createElement('div');
-        col.className = 'coluna-técnico bg-white p-4 rounded-2xl shadow-sm border-t-8 ' + corBorda + ' min-h-[300px] flex flex-col relative';
+        col.className = 'coluna-técnico coluna-rota bg-white p-4 rounded-2xl shadow-sm border-t-8 ' + corBorda + ' min-h-[300px] flex flex-col relative';
         col.setAttribute('data-nome', nomeDaRota);
 
         col.innerHTML =
