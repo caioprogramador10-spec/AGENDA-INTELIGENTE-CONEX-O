@@ -16,6 +16,217 @@ function getEmpresaId() {
 }
 
 // ================================================================
+// MAPA DE BAIRROS POR ZONA - Sistema de sugestão de rota
+// ================================================================
+var MAPA_ZONAS = {
+    "Zona Norte": {
+        cor: "#3b82f6", emoji: "🔵",
+        bairros: [
+            // Tijuca e adjacentes
+            "Tijuca","Vila Isabel","Maracanã","Grajaú","Andaraí","Alto da Boa Vista","Usina",
+            // Méier e adjacentes
+            "Méier","Engenho Novo","Riachuelo","Rocha","Sampaio","Lins de Vasconcelos","Todos os Santos","Cachambi","Encantado","Engenho de Dentro","Água Santa","Maria da Graça","Del Castilho","Inhaúma","Higienópolis","Abolição",
+            // Madureira e adjacentes
+            "Madureira","Cascadura","Vaz Lobo","Irajá","Vista Alegre","Vicente de Carvalho","Vila Kosmos","Campinho","Turiaçu","Rocha Miranda","Honório Gurgel","Oswaldo Cruz","Bento Ribeiro","Cavalcante","Engenheiro Leal","Piedade","Quintino Bocaiúva","Ramos","Cordovil","Penha","Penha Circular","Olaria","Brás de Pina","Parada de Lucas","Vigário Geral","Jardim América","Coelho Neto","Acari","Anchieta","Guadalupe","Parque Anchieta","Ricardo de Albuquerque","Costa Barros","Pavuna",
+            // Bonsucesso e adjacentes
+            "Bonsucesso","Ramos","Manguinhos","Benfica","Higienópolis","Jardim Carioca","Ilha do Governador",
+            // Ilha do Governador (bairros internos)
+            "Galeão","Cacuia","Bancários","Pitangueiras","Cocotá","Ribeira","Zumbi","Praia da Bandeira","Portuguesa","Jardim Guanabara","Jardim Carioca","Moneró","Tauá","Freguesia (Ilha)","Galeão","Jardim Guanabara","Zumbi",
+            // São Cristóvão
+            "São Cristóvão","Fundão","Caju","Benfica","Manguinhos",
+            // Norte geral
+            "Engenho da Rainha","Tomás Coelho","Complexo do Alemão","Jacaré","Bairro de Fátima","Jacarezinho"
+        ]
+    },
+    "Zona Sul": {
+        cor: "#ec4899", emoji: "🔴",
+        bairros: [
+            "Copacabana","Ipanema","Leblon","Botafogo","Flamengo","Catete","Glória","Urca","Leme","Lagoa",
+            "Jardim Botânico","Gávea","São Conrado","Vidigal","Rocinha","Humaitá","Cosme Velho",
+            "Laranjeiras","Catete","Flamengo","Aterro do Flamengo","Marina da Glória","Parque do Flamengo",
+            "Alto Leblon","Alto Ipanema","Arpoador","Posto 6","Posto 9","Posto 10","Posto 11","Posto 12",
+            "Jardim Botânico","Horto Florestal","Alto Gávea","Mirante da Floresta"
+        ]
+    },
+    "Zona Oeste": {
+        cor: "#f59e0b", emoji: "🟡",
+        bairros: [
+            // Barra e Recreio
+            "Barra da Tijuca","Recreio dos Bandeirantes","Camorim","Vargem Grande","Vargem Pequena",
+            "Joá","Grumari","Prainha","Barra de Guaratiba","Pedra de Guaratiba","Guaratiba",
+            "Itanhangá","Barra Olímpica","Ilha Pura","Riocentro","Jacarepaguá",
+            // Jacarepaguá
+            "Taquara","Tanque","Pechincha","Freguesia","Anil","Gardênia Azul","Curicica",
+            "Praça Seca","Vila Valqueire","Sulacap","Magalhães Bastos","Vila Militar",
+            "Deodoro","Padre Miguel","Realengo","Bangu","Santíssimo","Senador Camará",
+            // Campo Grande e Santa Cruz
+            "Campo Grande","Inhoaíba","Cosmos","Paciência","Santa Cruz","Sepetiba",
+            "Ilha de Guaratiba","Barra de Guaratiba","Pedra de Guaratiba","Guaratiba",
+            // Bairros menores
+            "Vila Kennedy","Vila Aliança","Vila Cosmos","Senador Vasconcelos","Inhoaíba",
+            "Santíssimo","Cosmos","Paciência","Santa Cruz","Sepetiba",
+            "Rio das Pedras","Muzema","Cidade de Deus","Triagem"
+        ]
+    },
+    "Centro / Zona Central": {
+        cor: "#8b5cf6", emoji: "🟣",
+        bairros: [
+            "Centro","Lapa","Santa Teresa","Estácio","Rio Comprido","Cidade Nova","Gamboa",
+            "Saúde","Santo Cristo","Caju","Catumbi","Paquetá","Praça Mauá","Porto Maravilha",
+            "Praça XV","Campo de Santana","Fátima","Praça da República","Cinelândia","Glória",
+            "Méier","Rocha","Sampaio","Encantado","Todos os Santos","Engenho Novo","Riachuelo",
+            "Praça da Bandeira","Mangue"
+        ]
+    },
+    "Baixada Fluminense": {
+        cor: "#10b981", emoji: "🟢",
+        bairros: [
+            // Nova Iguaçu
+            "Nova Iguaçu","Mesquita","Comendador Soares","Austin","Cabuçu","Cacuia","Califórnia","Cerâmica",
+            "Jardim Alvorada","Jardim Iguaçu","Jardim Nova Era","Kennedy","Luz","Moquetá","Palhada",
+            "Posse","Rancho Novo","Rodilândia","Rose Garden","Santa Rita","Tinguá","Vilar dos Teles",
+            // Duque de Caxias
+            "Duque de Caxias","Campos Elíseos","Centenário","Doutor Laureano","Figueira","Gramacho",
+            "Jardim Gramacho","Jardim Primavera","Merity","Parque Duque","Parque Paulista",
+            "Periquitos","Saracuruna","Xerém","Imbariê","Taquara (Caxias)","Jardim Anhangá",
+            // São João de Meriti
+            "São João de Meriti","Jardim Metrópole","Coelho da Rocha","Jardim Sumaré",
+            "Parque Analândia","Parque Novo Rio","Vilar dos Teles","São Mateus",
+            // Nilópolis
+            "Nilópolis","Frigorífico","Novo Horizonte","Olinda","Paiol","Manoel Reis",
+            // Belford Roxo
+            "Belford Roxo","Areia Branca","Heliópolis","Jardim Redentor","Piam","Santo Antônio da Prata",
+            "São Bernardo","Shangri-lá","Vila Pauline","Werneck","Lote XV","Nova Aurora",
+            // Queimados e outros
+            "Queimados","Japeri","Seropédica","Itaguaí","Paracambi","Engenheiro Pedreira",
+            "Jesuítas","Queimados","Jacutinga","São João","Santana",
+            // Magé e entorno
+            "Magé","Guapimirim","Suruí","Fragoso","Mauá","Bongaba","Santo Aleixo","Raiz da Serra",
+            "Piabetá","Governador Portela",
+            // Petrópolis e Serra
+            "Petrópolis","Teresópolis","Miguel Pereira","Paty do Alferes","Vassouras","Paraíba do Sul",
+            "Três Rios","Sapucaia","Areal","Comendador Levy Gasparian","Mendes","Engenheiro Paulo de Frontin",
+            // Itatiaia / Sul Fluminense
+            "Volta Redonda","Barra Mansa","Resende","Itatiaia","Porto Real","Pinheiral","Valença",
+            "Rio Claro","Barra do Piraí","Piraí","Rio das Flores","Vassouras"
+        ]
+    },
+    "Niterói / São Gonçalo": {
+        cor: "#f97316", emoji: "🟠",
+        bairros: [
+            // Niterói bairros
+            "Niterói","Icaraí","Ingá","Fonseca","Barreto","Cubango","Santa Rosa","São Francisco",
+            "Jurujuba","Itaipu","Pendotiba","Rio do Ouro","Alcântara","Arsenal","Ponta d'Areia",
+            "São Domingos","Charitas","Camboinhas","Maravista","Maria Paula","Região Oceânica",
+            "Piratininga","Itacoatiara","Várzea das Moças","Cafubá","Engenho do Mato","Serra Grande",
+            "Badu","Sapê","Maceió","Cantagalo (Niterói)","Muriqui (Niterói)",
+            // São Gonçalo bairros
+            "São Gonçalo","Alcântara","Arsenal","Barro Vermelho","Boa Vista","Boaçu","Colubandê",
+            "Coelho","Covanca","Gradim","Ipiíba","Itaoca","Laranjal","Lindo Parque","Marambaia",
+            "Monjolos","Mutuaguaçu","Mutundo","Neves","Pacheco","Patronato","Porto Novo",
+            "Porto Velho","Rocha","Santa Catarina","Santa Izabel","Trindade","Tribobó","Venda da Cruz",
+            "Vista Alegre (SG)","Zé Garoto",
+            // Itaboraí e entorno
+            "Itaboraí","Tanguá","Rio Bonito","Silva Jardim","Maricá","Saquarema",
+            "Cachoeiras de Macacu","Casimiro de Abreu"
+        ]
+    },
+    "Região dos Lagos": {
+        cor: "#06b6d4", emoji: "🩵",
+        bairros: [
+            "Cabo Frio","Búzios","Armação dos Búzios","Arraial do Cabo","São Pedro da Aldeia",
+            "Araruama","Iguaba Grande","Saquarema","Bacaxá","Sampaio Corrêa","Jaconé",
+            "Casimiro de Abreu","Barra de São João","Rio das Ostras","Carapebus",
+            "Macaé","Conceição de Macabu","Quissamã","Campos dos Goytacazes","São Fidélis",
+            "São Francisco do Itabapoana","São João da Barra"
+        ]
+    },
+    "Interior RJ / Norte Fluminense": {
+        cor: "#84cc16", emoji: "🍏",
+        bairros: [
+            "Campos dos Goytacazes","São Fidélis","Itaperuna","Bom Jesus do Itabapoana",
+            "Santo Antônio de Pádua","Miracema","Porciúncula","Cordeiro","Cantagalo",
+            "Nova Friburgo","Bom Jardim","Duas Barras","Carmo","Além Paraíba",
+            "Cambuci","Itaocara","Aperibé","São José de Ubá","Natividade","Varre-Sai",
+            "Laje do Muriaé","Italva","Bom Jesus do Itabapoana","São Francisco de Itabapoana",
+            "Cardoso Moreira","Trajano de Moraes","Nova Friburgo","Macuco","Santa Maria Madalena",
+            "Sumidouro","São Sebastião do Alto","Bom Jardim","Cachoeiras de Macacu",
+            "Rio Bonito","Silva Jardim","Araruama"
+        ]
+    }
+};
+
+// Detecta a zona de um bairro/localidade
+function detectarZona(texto) {
+    if (!texto) return null;
+    var textoNorm = texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+    var melhorMatch = null;
+    var melhorScore = 0;
+    for (var zona in MAPA_ZONAS) {
+        var bairros = MAPA_ZONAS[zona].bairros;
+        for (var i = 0; i < bairros.length; i++) {
+            var bairroNorm = bairros[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+            if (textoNorm.includes(bairroNorm) || bairroNorm.includes(textoNorm)) {
+                var score = bairroNorm.length;
+                if (score > melhorScore) {
+                    melhorScore = score;
+                    melhorMatch = zona;
+                }
+            }
+        }
+    }
+    return melhorMatch;
+}
+
+// Verifica conflito de zonas em uma rota (retorna aviso se tiver zonas muito distantes)
+function verificarConflitosRota(agendamentos) {
+    var zonaCount = {};
+    agendamentos.forEach(function(a) {
+        var local = (a.localidade || '') + ' ' + (a.endereco || '');
+        var zona = detectarZona(local);
+        if (zona) zonaCount[zona] = (zonaCount[zona] || 0) + 1;
+    });
+    var zonas = Object.keys(zonaCount);
+    // Zonas que NÃO devem ser misturadas
+    var gruposConflito = [
+        ['Zona Norte', 'Baixada Fluminense', 'Niterói / São Gonçalo'],
+        ['Zona Sul', 'Zona Oeste', 'Interior RJ'],
+        ['Região dos Lagos', 'Baixada Fluminense']
+    ];
+    var conflitos = [];
+    for (var i = 0; i < zonas.length; i++) {
+        for (var j = i + 1; j < zonas.length; j++) {
+            var z1 = zonas[i], z2 = zonas[j];
+            for (var k = 0; k < gruposConflito.length; k++) {
+                var g = gruposConflito[k];
+                if (g.indexOf(z1) !== -1 && g.indexOf(z2) !== -1) {
+                    // São conflitantes mas não são do mesmo grupo aceitável
+                }
+            }
+            // Zonas que definitivamente conflitam
+            var pares = [
+                ['Ilha do Governador', 'Baixada Fluminense'],
+                ['Zona Sul', 'Baixada Fluminense'],
+                ['Zona Sul', 'Interior RJ'],
+                ['Zona Sul', 'Niterói / São Gonçalo'],
+                ['Zona Norte', 'Zona Oeste'],
+                ['Zona Norte', 'Interior RJ'],
+                ['Zona Norte', 'Região dos Lagos'],
+                ['Baixada Fluminense', 'Região dos Lagos'],
+                ['Interior RJ', 'Zona Sul'],
+            ];
+            for (var p = 0; p < pares.length; p++) {
+                if ((pares[p][0] === z1 && pares[p][1] === z2) || (pares[p][1] === z1 && pares[p][0] === z2)) {
+                    conflitos.push(z1 + ' + ' + z2);
+                }
+            }
+        }
+    }
+    return { zonas: zonaCount, conflitos: conflitos };
+}
+
+
+// ================================================================
 // 1. NAVEGAÇÃO
 // ================================================================
 window.showTab = function(tabName) {
@@ -206,18 +417,46 @@ window.verDetalhes = async function(id) {
 };
 
 window.editarObservacao = async function(id) {
-    var { data } = await supabaseClient.from('agendamentos').select('observacao').eq('id', id).single();
-    var { value: novaObs, isConfirmed } = await Swal.fire({
-        title: '<span class="text-emerald-600 font-black text-base">Editar Observação</span>',
-        input: 'textarea', inputValue: data?.observacao || '',
-        inputPlaceholder: 'Digite as observações...', inputAttributes: { rows: 5 },
-        showCancelButton: true, confirmButtonText: 'SALVAR', cancelButtonText: 'Cancelar', confirmButtonColor: '#10b981'
-    });
-    if (!isConfirmed) return;
-    await supabaseClient.from('agendamentos').update({ observacao: novaObs }).eq('id', id);
-    var el = document.getElementById('obs-modal-' + id);
-    if (el) el.innerText = novaObs || 'Nenhuma observação.';
-    carregarAgendamentos();
+    try {
+        var { data, error } = await supabaseClient.from('agendamentos').select('observacao').eq('id', id).single();
+        if (error) throw error;
+        var obsAtual = (data && data.observacao) ? String(data.observacao) : '';
+        var resultado = await Swal.fire({
+            title: '<span style="color:#10b981;font-weight:900;">✏️ Editar Observação</span>',
+            html: '<textarea id="swal-obs-input" rows="5" placeholder="Digite as observações..." ' +
+                  'style="width:100%;padding:10px;border:2px solid #e2e8f0;border-radius:10px;font-size:14px;resize:vertical;outline:none;" ' +
+                  '>' + obsAtual.replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</textarea>',
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: '💾 SALVAR',
+            cancelButtonText: 'Cancelar',
+            confirmButtonColor: '#10b981',
+            cancelButtonColor: '#94a3b8',
+            didOpen: function() {
+                var ta = document.getElementById('swal-obs-input');
+                if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+            },
+            preConfirm: function() {
+                var ta = document.getElementById('swal-obs-input');
+                return ta ? ta.value : '';
+            }
+        });
+        if (!resultado.isConfirmed) return;
+        var novaObs = resultado.value || '';
+        var { error: errUpdate } = await supabaseClient.from('agendamentos').update({ observacao: novaObs }).eq('id', id);
+        if (errUpdate) throw errUpdate;
+        // Atualiza na tela sem recarregar tudo
+        var el = document.getElementById('obs-modal-' + id);
+        if (el) el.innerText = novaObs || 'Nenhuma observação.';
+        // Atualiza card na roteirização se existir
+        var cardObs = document.querySelector('[data-id="' + id + '"] .card-obs-text');
+        if (cardObs) cardObs.innerText = novaObs;
+        await Swal.fire({ icon: 'success', title: 'Salvo!', timer: 1200, showConfirmButton: false });
+        carregarAgendamentos();
+    } catch(e) {
+        console.error('Erro editarObservacao:', e);
+        Swal.fire({ icon: 'error', title: 'Erro ao salvar', text: String(e.message || e) });
+    }
 };
 
 window.excluirAgendamento = async function(id) {
@@ -424,7 +663,14 @@ async function carregarRoteirizacao() {
         card.setAttribute('data-placa', item.placa_veiculo || '');
         card.setAttribute('data-responsavel', item.responsavel_agendamento || '');
         card.className = 'card-servico bg-white rounded-xl shadow-sm border-l-4 border-slate-400 cursor-grab';
+        var _zona = detectarZona((item.localidade || '') + ' ' + (item.endereco || ''));
+        var _zonaInfo = _zona ? MAPA_ZONAS[_zona] : null;
+        card.setAttribute('data-zona', _zona || '');
+        var _badgeZona = _zonaInfo
+            ? '<span style="background:' + _zonaInfo.cor + '20;color:' + _zonaInfo.cor + ';border:1px solid ' + _zonaInfo.cor + ';font-size:8px;font-weight:900;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:3px;">' + _zonaInfo.emoji + ' ' + _zona + '</span>'
+            : '';
         card.innerHTML =
+            _badgeZona +
             '<p class="font-black text-[11px] uppercase">' + item.associado + '</p>' +
             '<p class="text-[10px] text-emerald-600 mb-2">' + item.localidade + '</p>' +
             '<button onclick="event.stopPropagation(); transferirServico(\'' + item.id + '\')" ' +
@@ -463,10 +709,16 @@ async function carregarRoteirizacao() {
         var cardsHTML = servicosNaRota.map(function(s) {
             var enc       = encodeURIComponent(JSON.stringify(s));
             var bordaCard = s.status === 'Frustrado' ? 'border-red-500 bg-red-50' : 'border-emerald-500';
-            return '<div class="card-servico bg-white rounded shadow-sm border-l-4 ' + bordaCard + ' cursor-grab"' +
+            var _zonaCard = detectarZona((s.localidade || '') + ' ' + (s.endereco || ''));
+        var _zonaCardInfo = _zonaCard ? MAPA_ZONAS[_zonaCard] : null;
+        var _badgeZonaCard = _zonaCardInfo
+            ? '<span style=\'background:' + _zonaCardInfo.cor + '20;color:' + _zonaCardInfo.cor + ';border:1px solid ' + _zonaCardInfo.cor + ';font-size:8px;font-weight:900;padding:1px 5px;border-radius:20px;display:inline-block;margin-bottom:2px;\'>' + _zonaCardInfo.emoji + ' ' + _zonaCard + '</span>'
+            : '';
+        return '<div class="card-servico bg-white rounded shadow-sm border-l-4 ' + bordaCard + ' cursor-grab" data-zona="' + (_zonaCard||'') + '"' +
                 ' data-id="' + s.id + '" data-bairro="' + s.localidade + '"' +
                 ' data-placa="' + (s.placa_veiculo || '') + '" data-responsavel="' + (s.responsavel_agendamento || '') + '"' +
                 ' data-dados="' + enc + '" onclick="window.abrirDetalhesCard(this)">' +
+                _badgeZonaCard +
                 '<span class="font-bold text-[10px] uppercase">' + s.associado + '</span><br>' +
                 '<span class="font-normal text-[10px] text-slate-400">' + s.localidade + '</span><br>' +
                 '<div class="flex gap-1 mt-1 flex-wrap">' +
@@ -522,8 +774,56 @@ async function carregarRoteirizacao() {
                 var listaBairros    = (textareaBairros ? textareaBairros.value : '')
                     .replace(/\n/g,',').split(',').map(function(b){ return b.trim().toLowerCase(); }).filter(Boolean);
 
-                if (listaBairros.length > 0 && !listaBairros.some(function(b){ return b===bairroAgend||bairroAgend.includes(b); }))
-                    alert('Atenção: "' + bairroAgend.toUpperCase() + '" não está na lista de ' + nomeDaRota + '!');
+                // Verificar conflito de zona
+                var zonaCardArrastar = card.getAttribute('data-zona');
+                var cardsNaRota      = evt.to.querySelectorAll('[data-id]');
+                var zonasDaRota      = [];
+                cardsNaRota.forEach(function(c){
+                    var z = c.getAttribute('data-zona');
+                    if (z && z !== zonaCardArrastar && zonasDaRota.indexOf(z) === -1) zonasDaRota.push(z);
+                });
+                var conflitos = [];
+                if (zonaCardArrastar) {
+                    var paresConflito = [
+                        ['Zona Norte','Zona Sul'],['Zona Norte','Zona Oeste'],['Zona Norte','Interior RJ'],['Zona Norte','Região dos Lagos'],
+                        ['Zona Sul','Baixada Fluminense'],['Zona Sul','Interior RJ'],['Zona Sul','Niterói / São Gonçalo'],
+                        ['Zona Oeste','Zona Norte'],['Zona Oeste','Niterói / São Gonçalo'],['Zona Oeste','Interior RJ'],
+                        ['Baixada Fluminense','Região dos Lagos'],['Baixada Fluminense','Zona Sul'],
+                        ['Niterói / São Gonçalo','Zona Oeste'],['Niterói / São Gonçalo','Zona Sul']
+                    ];
+                    zonasDaRota.forEach(function(z){
+                        paresConflito.forEach(function(par){
+                            if ((par[0]===zonaCardArrastar&&par[1]===z)||(par[1]===zonaCardArrastar&&par[0]===z))
+                                if (conflitos.indexOf(z) === -1) conflitos.push(z);
+                        });
+                    });
+                }
+                if (conflitos.length > 0) {
+                    var zonaCardInfo = zonaCardArrastar ? MAPA_ZONAS[zonaCardArrastar] : null;
+                    var res = await Swal.fire({
+                        icon: 'warning',
+                        title: '⚠️ Conflito de Rota!',
+                        html: '<div style="font-size:14px;line-height:1.6;">' +
+                              '<b>' + bairroAgend.toUpperCase() + '</b> é da <b style="color:' + (zonaCardInfo?zonaCardInfo.cor:'#333') + '">' + zonaCardArrastar + '</b><br>' +
+                              'Esta rota já tem serviços da zona: <b style="color:#dc2626">' + conflitos.join(', ') + '</b><br><br>' +
+                              '<small style="color:#64748b;">Misturar essas regiões pode gerar rotas muito longas. Deseja continuar mesmo assim?</small>' +
+                              '</div>',
+                        showCancelButton: true,
+                        confirmButtonText: '✅ Sim, alocar mesmo assim',
+                        cancelButtonText: '❌ Não, cancelar',
+                        confirmButtonColor: '#f59e0b',
+                        cancelButtonColor: '#94a3b8'
+                    });
+                    if (!res.isConfirmed) { evt.from.appendChild(card); return; }
+                } else if (listaBairros.length > 0 && !listaBairros.some(function(b){ return b===bairroAgend||bairroAgend.includes(b); })) {
+                    var res2 = await Swal.fire({
+                        icon: 'info', title: 'Bairro fora da lista',
+                        html: '<b>' + bairroAgend.toUpperCase() + '</b> não está nos bairros definidos para <b>' + nomeDaRota + '</b>.<br>Deseja alocar mesmo assim?',
+                        showCancelButton: true, confirmButtonText: 'Sim', cancelButtonText: 'Não',
+                        confirmButtonColor: '#10b981', cancelButtonColor: '#94a3b8'
+                    });
+                    if (!res2.isConfirmed) { evt.from.appendChild(card); return; }
+                }
 
                 var total = evt.to.querySelectorAll('[data-id]').length;
                 if (total > 9) { alert('Limite de 9 serviços atingido!'); evt.from.appendChild(card); return; }
@@ -1000,4 +1300,85 @@ window.gerarRelatorioPDF = async function() {
     win.document.write(html);
     win.document.close();
     win.onload = function(){ win.focus(); win.print(); };
+};
+// ================================================================
+// MODAL MAPA DE ZONAS - consulta rápida de bairros
+// ================================================================
+window.abrirMapaZonas = function(termoBusca) {
+    var termo = (termoBusca || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    
+    var html = '<div style="text-align:left;">';
+    
+    // Barra de busca
+    html += '<div style="margin-bottom:16px;">' +
+        '<input id="busca-mapa-zonas" type="text" placeholder="🔍 Buscar bairro ou cidade..." value="' + (termoBusca||'') + '" ' +
+        'onkeyup="filtrarMapaZonas()" ' +
+        'style="width:100%;padding:10px 14px;border:2px solid #e2e8f0;border-radius:12px;font-size:14px;outline:none;font-weight:700;" />' +
+    '</div>';
+    
+    html += '<div id="resultado-mapa-zonas">';
+    
+    for (var zona in MAPA_ZONAS) {
+        var info = MAPA_ZONAS[zona];
+        var bairrosFiltrados = termo 
+            ? info.bairros.filter(function(b){ return b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo); })
+            : info.bairros;
+        
+        if (bairrosFiltrados.length === 0) continue;
+        
+        html += '<div class="zona-bloco" style="margin-bottom:12px;border-radius:12px;overflow:hidden;border:2px solid ' + info.cor + '20;">' +
+            '<div style="background:' + info.cor + ';color:white;padding:8px 14px;font-weight:900;font-size:13px;letter-spacing:1px;">' +
+                info.emoji + ' ' + zona + ' <span style="opacity:0.8;font-size:11px;font-weight:700;">(' + info.bairros.length + ' regiões)</span>' +
+            '</div>' +
+            '<div style="padding:10px 12px;background:white;display:flex;flex-wrap:wrap;gap:5px;">' +
+            bairrosFiltrados.map(function(b){
+                var destaque = termo && b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo);
+                return '<span style="background:' + (destaque ? info.cor : info.cor+'15') + ';color:' + (destaque ? 'white' : info.cor) + ';' +
+                       'border:1px solid ' + info.cor + '40;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:' + (destaque?'900':'700') + ';">' +
+                       b + '</span>';
+            }).join('') +
+            '</div></div>';
+    }
+    
+    html += '</div></div>';
+    
+    Swal.fire({
+        title: '<span style="color:#0f172a;font-weight:900;font-size:16px;">🗺️ Mapa de Zonas — Bairros por Região</span>',
+        html: html,
+        width: '800px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        didOpen: function() {
+            var inp = document.getElementById('busca-mapa-zonas');
+            if (inp) inp.focus();
+        }
+    });
+};
+
+window.filtrarMapaZonas = function() {
+    var inp = document.getElementById('busca-mapa-zonas');
+    var termo = inp ? inp.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'') : '';
+    var resultado = document.getElementById('resultado-mapa-zonas');
+    if (!resultado) return;
+    
+    var html = '';
+    for (var zona in MAPA_ZONAS) {
+        var info = MAPA_ZONAS[zona];
+        var bairrosFiltrados = termo 
+            ? info.bairros.filter(function(b){ return b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo); })
+            : info.bairros;
+        if (bairrosFiltrados.length === 0) continue;
+        html += '<div class="zona-bloco" style="margin-bottom:12px;border-radius:12px;overflow:hidden;border:2px solid ' + info.cor + '20;">' +
+            '<div style="background:' + info.cor + ';color:white;padding:8px 14px;font-weight:900;font-size:13px;">' +
+                info.emoji + ' ' + zona +
+            '</div>' +
+            '<div style="padding:10px 12px;background:white;display:flex;flex-wrap:wrap;gap:5px;">' +
+            bairrosFiltrados.map(function(b){
+                var destaque = termo && b.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(termo);
+                return '<span style="background:' + (destaque ? info.cor : info.cor+'15') + ';color:' + (destaque ? 'white' : info.cor) + ';' +
+                       'border:1px solid ' + info.cor + '40;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:' + (destaque?'900':'700') + ';">' + b + '</span>';
+            }).join('') +
+            '</div></div>';
+    }
+    resultado.innerHTML = html || '<p style="color:#94a3b8;text-align:center;padding:20px;">Nenhum bairro encontrado para "' + inp.value + '"</p>';
 };
