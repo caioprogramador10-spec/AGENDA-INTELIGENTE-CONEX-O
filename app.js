@@ -1037,7 +1037,12 @@ window.filtrarAgendamentosPlaca = function() {
 };
 
 window.filtrarColunastécnicos = function() {
-    var termo = (document.getElementById('busca-técnico')?.value || '').toLowerCase();
+    // Limpa busca por placa ao usar filtro de moto
+    var inputPlaca = document.getElementById('busca-placa-rota');
+    if (inputPlaca) inputPlaca.value = '';
+    limparDestaquePlaca();
+
+    var termo = (document.getElementById('busca-técnico')?.value || '').toLowerCase().trim();
     document.querySelectorAll('.coluna-técnico').forEach(function(col) {
         var nomeTec   = col.getAttribute('data-nome').toLowerCase();
         var encontrou = false;
@@ -1045,12 +1050,114 @@ window.filtrarColunastécnicos = function() {
             var placa     = (card.getAttribute('data-placa') || '').toLowerCase();
             var associado = card.innerText.toLowerCase();
             var visivel   = termo === '' || placa.includes(termo) || associado.includes(termo) || nomeTec.includes(termo);
-            card.style.display = visivel ? 'block' : 'none';
+            card.style.display = visivel ? '' : 'none';
             if (visivel && termo !== '') { encontrou = true; card.classList.add('ring-2','ring-amber-500'); }
             else card.classList.remove('ring-2','ring-amber-500');
         });
-        col.style.display = (nomeTec.includes(termo) || encontrou || termo === '') ? 'block' : 'none';
+        col.style.display = (nomeTec.includes(termo) || encontrou || termo === '') ? '' : 'none';
     });
+};
+
+function limparDestaquePlaca() {
+    document.querySelectorAll('.card-servico').forEach(function(card) {
+        card.classList.remove('ring-4','ring-amber-400','ring-2','ring-amber-500','bg-amber-50');
+        card.style.display = '';
+    });
+    document.querySelectorAll('.coluna-técnico').forEach(function(col) {
+        col.style.display = '';
+        // Remove banner de resultado
+        var banner = col.querySelector('.banner-placa');
+        if (banner) banner.remove();
+    });
+    // Remove painel de resultado global
+    var painel = document.getElementById('painel-resultado-placa');
+    if (painel) painel.remove();
+}
+
+window.filtrarPorPlaca = function() {
+    // Limpa filtro de moto
+    var inputMoto = document.getElementById('busca-técnico');
+    if (inputMoto) inputMoto.value = '';
+
+    var inputPlaca = document.getElementById('busca-placa-rota');
+    var placa = (inputPlaca ? inputPlaca.value : '').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
+    inputPlaca.value = placa;
+
+    // Limpa destaques anteriores
+    limparDestaquePlaca();
+
+    if (placa.length < 3) return; // espera ao menos 3 chars
+
+    var encontrados = [];
+    var colunasComMatch = new Set();
+
+    document.querySelectorAll('.card-servico').forEach(function(card) {
+        var cardPlaca = (card.getAttribute('data-placa') || '').toUpperCase().replace(/[^A-Z0-9]/g,'');
+        if (cardPlaca.includes(placa)) {
+            encontrados.push(card);
+            var col = card.closest('.coluna-técnico');
+            if (col) colunasComMatch.add(col);
+        }
+    });
+
+    if (encontrados.length === 0) {
+        // Nenhum resultado — mostra aviso
+        var aviso = document.createElement('div');
+        aviso.id = 'painel-resultado-placa';
+        aviso.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:9999;' +
+            'background:#fff1f2;border:2px solid #fecdd3;border-radius:14px;padding:16px 28px;' +
+            'font-weight:900;color:#dc2626;font-size:14px;box-shadow:0 8px 32px rgba(0,0,0,0.15);text-align:center;';
+        aviso.innerHTML = '🔍 Placa <b>' + placa + '</b> não encontrada em nenhuma rota do dia.';
+        document.body.appendChild(aviso);
+        setTimeout(function(){ if(aviso.parentNode) aviso.remove(); }, 3000);
+        return;
+    }
+
+    // Oculta colunas sem match
+    document.querySelectorAll('.coluna-técnico').forEach(function(col) {
+        if (!colunasComMatch.has(col)) {
+            col.style.display = 'none';
+        }
+    });
+
+    // Destaca os cards encontrados e mostra banner na coluna
+    colunasComMatch.forEach(function(col) {
+        var nomeMoto = col.getAttribute('data-nome') || '';
+        // Banner no topo da coluna
+        var banner = document.createElement('div');
+        banner.className = 'banner-placa';
+        banner.style.cssText = 'background:#f59e0b;color:white;font-weight:900;font-size:11px;' +
+            'padding:5px 10px;border-radius:8px;margin-bottom:8px;text-align:center;letter-spacing:1px;';
+        banner.innerHTML = '🚗 PLACA ' + placa + ' ENCONTRADA AQUI';
+        var body = col.querySelector('.cards-container') || col.querySelector('[id^="cards-"]') || col;
+        col.insertBefore(banner, col.querySelector('.card-servico'));
+    });
+
+    encontrados.forEach(function(card) {
+        card.classList.add('ring-4','ring-amber-400','bg-amber-50');
+        // Scroll suave até o primeiro card
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+
+    // Painel de resultado flutuante
+    var rotasEncontradas = Array.from(colunasComMatch).map(function(col){
+        return col.getAttribute('data-nome') || '?';
+    });
+    var painel = document.createElement('div');
+    painel.id = 'painel-resultado-placa';
+    painel.style.cssText = 'position:fixed;top:80px;right:20px;z-index:9999;' +
+        'background:white;border:3px solid #f59e0b;border-radius:16px;padding:14px 20px;' +
+        'box-shadow:0 8px 32px rgba(0,0,0,0.18);min-width:220px;';
+    painel.innerHTML =
+        '<div style="font-size:12px;font-weight:900;color:#92400e;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;">🚗 Resultado da Busca</div>' +
+        '<div style="font-size:20px;font-weight:900;color:#0f172a;font-family:monospace;letter-spacing:3px;margin-bottom:8px;">' + placa + '</div>' +
+        '<div style="font-size:11px;color:#64748b;font-weight:700;margin-bottom:6px;">Encontrada em ' + encontrados.length + ' serviço(s):</div>' +
+        rotasEncontradas.map(function(r){
+            return '<div style="background:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:900;color:#92400e;margin-top:4px;">🏍️ ' + r + '</div>';
+        }).join('') +
+        '<button onclick="limparDestaquePlaca();document.getElementById(\'busca-placa-rota\').value=\'\';this.parentNode.remove();" ' +
+        'style="margin-top:10px;width:100%;background:#e2e8f0;border:none;border-radius:8px;padding:6px;font-weight:900;font-size:11px;cursor:pointer;color:#475569;">✖ LIMPAR BUSCA</button>';
+    document.body.appendChild(painel);
 };
 
 // ================================================================
